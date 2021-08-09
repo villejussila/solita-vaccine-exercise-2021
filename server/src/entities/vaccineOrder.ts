@@ -1,11 +1,17 @@
 import { prop, getModelForClass } from '@typegoose/typegoose';
+import { isDateString } from 'class-validator';
 import {
+  Arg,
   Field,
   InputType,
   Int,
   ObjectType,
   registerEnumType,
+  Root,
 } from 'type-graphql';
+
+import { getExpirationDate } from '../utils/date';
+
 import { Vaccination } from './vaccination';
 
 @ObjectType()
@@ -40,6 +46,22 @@ export class VaccineOrder {
 
   @Field(() => [Vaccination], { nullable: true })
   vaccinationsDoneWithVaccine!: [Vaccination];
+
+  @Field({ nullable: true })
+  bottleExpires(@Root() root: VaccineOrder): string {
+    return getExpirationDate(root.arrived);
+  }
+  @Field({ nullable: true })
+  isBottleExpiredOnDate(@Root() root: VaccineOrder, @Arg('date') date: string): boolean {
+    const expirationDate = getExpirationDate(root.arrived);
+    if (!isDateString(date)) {
+      throw new Error('invalid date format: ' + date);
+    }
+    if (date >= expirationDate) {
+      return true;
+    }
+    return false;
+  }
 }
 
 export const VaccineOrderModel = getModelForClass(VaccineOrder);

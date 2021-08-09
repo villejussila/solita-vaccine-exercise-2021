@@ -10,6 +10,8 @@ import {
   Root,
   FieldResolver,
 } from 'type-graphql';
+
+import { getStartOfDayISO, getEndOfDayISO } from '../utils/date';
 import { Vaccination } from '../entities/vaccination';
 import {
   VaccineInput,
@@ -37,72 +39,74 @@ export class VaccineOrderResolver {
 
   @Query((_returns) => [VaccineOrder])
   async allVaccineOrders(
-    @Arg('vaccine', { nullable: true }) vaccine?: VaccineInput,
-    @Arg('arrivedByDate', { nullable: true }) arrivedByDate?: string
-  ): Promise<DocumentType<VaccineOrder, BeAnObject>[]> {
-    if (vaccine && arrivedByDate) {
-      return vaccineOrdersByProducerAndArrivedByDate(vaccine, arrivedByDate);
-    }
-
+    @Arg('vaccine', { nullable: true }) vaccine?: VaccineInput
+  ): Promise<VaccineOrder[]> {
     if (vaccine) {
       return vaccineOrdersByProducer(vaccine);
-    }
-
-    if (arrivedByDate) {
-      return vaccineOrdersArrivedByDate(arrivedByDate);
     }
     return VaccineOrderModel.find({});
   }
 
-  //   @Query((_returns) => [VaccineOrder])
-  //   async allVaccineOrders2(
-  //     @Arg('byDate', { nullable: true }) byDate?: string
-  //   ): Promise<VaccineOrder[]> {
-  //     if (byDate) {
-  //       /*
-  //       const dateISO = new Date(byDate).toISOString();
-  //       const dateISO2 = new Date('2021-03-21').toISOString();
-  //       const response: VaccineOrder[] = await VaccineOrderModel.aggregate([
-  //         {
-  //           $match: {
-  //             arrived: { $lte: dateISO },
-  //           },
-  //           $match: {
-  //             $and: [
-  //               { arrived: { $gte: dateISO } },
-  //               { arrived: { $lt: dateISO2 } },
-  //             ],
-  //           },
-  //       },
-  //         {
-  //           $lookup: {
-  //             from: 'vaccinations',
-  //             localField: 'id',
-  //             foreignField: 'sourceBottle',
-  //             as: 'vaccinationsDoneWithVaccine',
-  //           },
-  //         },
-  //         {
-  //           $unwind: '$vaccinationsWithVaccine',
-  //         },
-  //       ]);
-  //       console.log(response.length);
-  //       return response;
-  //       */
-  //     }
-  //     return VaccineOrderModel.find({});
-  //   }
+  @Query((_returns) => [VaccineOrder])
+  async vaccineOrdersArrivedByDate(
+    @Arg('date', { nullable: false }) date: string,
+    @Arg('vaccine', { nullable: true }) vaccine?: VaccineInput
+  ): Promise<DocumentType<VaccineOrder, BeAnObject>[]> {
+    if (vaccine && date) {
+      return vaccineOrdersByProducerAndArrivedByDate(vaccine, date);
+    }
+    return vaccineOrdersArrivedByDate(date);
+  }
+  @Query((_returns) => [VaccineOrder])
+  async vaccineOrdersArrivedOnDate(
+    @Arg('date', { nullable: false }) date: string,
+    @Arg('vaccine', { nullable: true }) vaccine?: VaccineInput
+  ): Promise<DocumentType<VaccineOrder, BeAnObject>[]> {
+    console.log(date);
+    if (vaccine && date) {
+      return vaccineOrdersByProducerAndArrivedOnDate(vaccine, date);
+    }
+    return vaccineOrdersArrivedOnDate(date);
+  }
 }
+
+const vaccineOrdersByProducerAndArrivedOnDate = (
+  vaccine: VaccineInput,
+  date: string
+) => {
+  parseVaccineProducer(vaccine.vaccineProducer);
+  if (!isDateString(date)) {
+    throw new Error('invalid date format: ' + date);
+  }
+  let dateISO = new Date(date).toISOString();
+  const dayStartISO = getStartOfDayISO(date);
+  if (dateISO === dayStartISO) {
+    dateISO = getEndOfDayISO(date);
+  }
+  return VaccineOrderModel.find({
+    $and: [
+      {
+        vaccine: { $in: [vaccine.vaccineProducer] },
+      },
+      {
+        $and: [
+          { arrived: { $gt: dayStartISO } },
+          { arrived: { $lte: dateISO } },
+        ],
+      },
+    ],
+  });
+};
 
 const vaccineOrdersByProducerAndArrivedByDate = (
   vaccine: VaccineInput,
-  arrivedByDate: string
+  date: string
 ) => {
   parseVaccineProducer(vaccine.vaccineProducer);
-  if (!isDateString(arrivedByDate)) {
-    throw new Error('invalid date format: ' + arrivedByDate);
+  if (!isDateString(date)) {
+    throw new Error('invalid date format: ' + date);
   }
-  const dateISO = new Date(arrivedByDate).toISOString();
+  const dateISO = new Date(date).toISOString();
   return VaccineOrderModel.find({
     $and: [
       {
@@ -120,10 +124,25 @@ const vaccineOrdersByProducer = (vaccine: VaccineInput) => {
   });
 };
 
-const vaccineOrdersArrivedByDate = (arrivedByDate: string) => {
-  if (!isDateString(arrivedByDate)) {
-    throw new Error('invalid date format: ' + arrivedByDate);
+const vaccineOrdersArrivedByDate = (date: string) => {
+  if (!isDateString(date)) {
+    throw new Error('invalid date format: ' + date);
   }
-  const dateISO = new Date(arrivedByDate).toISOString();
+  const dateISO = new Date(date).toISOString();
   return VaccineOrderModel.find({ arrived: { $lte: dateISO } });
+};
+
+const vaccineOrdersArrivedOnDate = (date: string) => {
+  if (!isDateString(date)) {
+    throw new Error('invalid date format: ' + date);
+  }
+  let dateISO = new Date(date).toISOString();
+  const dayStartISO = getStartOfDayISO(date);
+  if (dateISO === dayStartISO) {
+    dateISO = getEndOfDayISO(date);
+  }
+
+  return VaccineOrderModel.find({
+    $and: [{ arrived: { $gt: dayStartISO } }, { arrived: { $lte: dateISO } }],
+  });
 };

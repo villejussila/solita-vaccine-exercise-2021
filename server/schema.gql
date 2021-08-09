@@ -5,10 +5,11 @@
 
 type Query {
   allVaccinations(onDate: String, untilDate: String): [Vaccination!]!
-  allVaccineOrders(arrivedByDate: String, vaccine: VaccineInput): [VaccineOrder!]!
-  test: [Vaccination!]!
+  allVaccineOrders(vaccine: VaccineInput): [VaccineOrder!]!
   vaccinationCount: Int!
   vaccineOrderCount: Int!
+  vaccineOrdersArrivedByDate(date: String!, vaccine: VaccineInput): [VaccineOrder!]!
+  vaccineOrdersArrivedOnDate(date: String!, vaccine: VaccineInput): [VaccineOrder!]!
 }
 
 type Vaccination {
@@ -16,7 +17,6 @@ type Vaccination {
   sourceBottle: String!
   vaccinationDate: String!
   vaccinationId: String!
-  vaccineOrder: VaccineOrder
 }
 
 input VaccineInput {
@@ -25,9 +25,11 @@ input VaccineInput {
 
 type VaccineOrder {
   arrived: String!
+  bottleExpires: String
   healthCareDistrict: String!
   id: String!
   injections: Int!
+  isBottleExpiredOnDate(date: String!): Boolean
   orderNumber: Int!
   responsiblePerson: String!
   vaccinationsDoneWithVaccine: [Vaccination!]
