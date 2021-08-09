@@ -1,5 +1,12 @@
 import { prop, getModelForClass } from '@typegoose/typegoose';
-import { Field, InputType, Int, ObjectType, registerEnumType } from 'type-graphql';
+import {
+  Field,
+  InputType,
+  Int,
+  ObjectType,
+  registerEnumType,
+} from 'type-graphql';
+import { Vaccination } from './vaccination';
 
 @ObjectType()
 export class VaccineOrder {
@@ -30,6 +37,9 @@ export class VaccineOrder {
   @Field()
   @prop({ required: true })
   arrived!: string;
+
+  @Field(() => [Vaccination], { nullable: true })
+  vaccinationsDoneWithVaccine!: [Vaccination];
 }
 
 export const VaccineOrderModel = getModelForClass(VaccineOrder);

@@ -8,6 +8,7 @@ import { VaccineOrderResolver } from './src/modules/VaccineOrder';
 import { VaccinationResolver } from './src/modules/Vaccination';
 import path from 'path';
 import { TypegooseMiddleware } from './typegoose-middleware';
+import { createVaccinationLoader } from './src/loaders/VaccinationLoader';
 
 const startServer = async () => {
   try {
@@ -29,7 +30,10 @@ const startServer = async () => {
     globalMiddlewares: [TypegooseMiddleware],
   });
 
-  const server = new ApolloServer({ schema });
+  const server = new ApolloServer({
+    schema,
+    context: () => ({ vaccinationLoader: createVaccinationLoader() }),
+  });
 
   const app = express();
   void (await server.start());
