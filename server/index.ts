@@ -39,6 +39,8 @@ const startServer = async () => {
   void (await server.start());
   server.applyMiddleware({ app });
 
+  app.use(express.static('build'));
+
   app.listen({ port: config.PORT }, () =>
     console.log(`Server started at http://localhost:4000${server.graphqlPath}`)
   );

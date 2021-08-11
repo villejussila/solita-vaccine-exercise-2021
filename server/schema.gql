@@ -19,6 +19,13 @@ type Vaccination {
   vaccinationId: String!
 }
 
+"""Vaccine producers"""
+enum Vaccine {
+  ANTIQUA
+  SOLAR_BUDDHICA
+  ZERPFY
+}
+
 input VaccineInput {
   vaccineProducer: String!
 }
@@ -33,5 +40,5 @@ type VaccineOrder {
   orderNumber: Int!
   responsiblePerson: String!
   vaccinationsDoneWithVaccine: [Vaccination!]
-  vaccine: String!
+  vaccine: Vaccine!
 }

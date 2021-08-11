@@ -32,7 +32,7 @@ export class VaccineOrder {
   @prop({ required: true })
   healthCareDistrict!: string;
 
-  @Field()
+  @Field((_type) => Vaccine)
   @prop({ required: true })
   vaccine!: Vaccine;
 
@@ -52,7 +52,10 @@ export class VaccineOrder {
     return getExpirationDate(root.arrived);
   }
   @Field({ nullable: true })
-  isBottleExpiredOnDate(@Root() root: VaccineOrder, @Arg('date') date: string): boolean {
+  isBottleExpiredOnDate(
+    @Root() root: VaccineOrder,
+    @Arg('date') date: string
+  ): boolean {
     const expirationDate = getExpirationDate(root.arrived);
     if (!isDateString(date)) {
       throw new Error('invalid date format: ' + date);
