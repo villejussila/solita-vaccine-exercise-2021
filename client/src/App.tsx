@@ -1,14 +1,16 @@
 import React from 'react';
 import { useLazyQuery } from '@apollo/client';
 import {
-  VaccineOrdersArrived,
   VaccineOrdersArrivedVars,
+  VaccineOrdersArrivedByDateData,
+  VaccineOrdersArrivedOnDateData,
   VACCINE_ORDER_ARRIVED_BY_DATE,
   VACCINE_ORDER_ARRIVED_ON_DATE,
 } from './queries';
 import { AppBar, Container, Toolbar, Typography } from '@material-ui/core';
 import DateAndTimePicker from './components/DateAndTimePicker';
 import { convertLocalTime, removeTimeFromDate } from './utils';
+import SearchResultList from './components/SearchResultList';
 
 function App() {
   const [selectedDate, setSelectedDate] = React.useState<Date | null>(
@@ -20,21 +22,22 @@ function App() {
   const [isTimeIncludedChecked, setIsTimeIncludedChecked] =
     React.useState<boolean>(true);
 
-  const [getVaccineOrdersArrivedBy, { data: vaccineOrdersArrivedByDate }] =
-    useLazyQuery<VaccineOrdersArrived, VaccineOrdersArrivedVars>(
-      VACCINE_ORDER_ARRIVED_BY_DATE,
-      {
-        variables: {
-          date: isTimeIncludedChecked
-            ? convertedDate
-            : (convertedDate && removeTimeFromDate(convertedDate)) || null,
-        },
-        fetchPolicy: 'cache-and-network',
-      }
-    );
+  const [
+    getVaccineOrdersArrivedBy,
+    { loading: loadingOrders, data: vaccineOrdersArrivedByDate },
+  ] = useLazyQuery<VaccineOrdersArrivedByDateData, VaccineOrdersArrivedVars>(
+    VACCINE_ORDER_ARRIVED_BY_DATE,
+    {
+      variables: {
+        date: isTimeIncludedChecked
+          ? convertedDate
+          : (convertedDate && removeTimeFromDate(convertedDate)) || null,
+      },
+    }
+  );
 
   const [getVaccineOrdersArrivedOn, { data: vaccineOrdersArrivedOnDate }] =
-    useLazyQuery<VaccineOrdersArrived, VaccineOrdersArrivedVars>(
+    useLazyQuery<VaccineOrdersArrivedOnDateData, VaccineOrdersArrivedVars>(
       VACCINE_ORDER_ARRIVED_ON_DATE,
       {
         variables: {
@@ -42,7 +45,6 @@ function App() {
             ? convertedDate
             : (convertedDate && removeTimeFromDate(convertedDate)) || null,
         },
-        fetchPolicy: 'cache-and-network',
       }
     );
 
@@ -103,6 +105,12 @@ function App() {
         handleClick={handleClickSearch}
         handleCheckedChange={handleCheckedChange}
         checked={isTimeIncludedChecked}
+      />
+      <SearchResultList
+        dataArrivedByDate={vaccineOrdersArrivedByDate}
+        dataArrivedOnDate={vaccineOrdersArrivedOnDate}
+        convertedDate={convertedDate}
+        loadingOrders={loadingOrders}
       />
     </Container>
   );

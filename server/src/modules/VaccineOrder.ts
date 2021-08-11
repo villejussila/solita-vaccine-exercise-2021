@@ -107,6 +107,7 @@ const vaccineOrdersByProducerAndArrivedByDate = (
     throw new Error('invalid date format: ' + date);
   }
   const dateISO = new Date(date).toISOString();
+  console.log(`by date: ${dateISO}`);
   return VaccineOrderModel.find({
     $and: [
       {

@@ -16,9 +16,16 @@ interface VaccineOrderBase {
   arrived: string;
 }
 
+export interface VaccineOrdersArrivedByDateData {
+  vaccineOrdersArrivedByDate: VaccineOrdersArrived[];
+}
+export interface VaccineOrdersArrivedOnDateData {
+  vaccineOrdersArrivedOnDate: VaccineOrdersArrived[];
+}
+
 export interface VaccineOrdersArrived extends VaccineOrderBase {
   bottleExpires: string;
-  isBottleExpiredOnDate: (date: string) => boolean;
+  isBottleExpiredOnDate: boolean;
   vaccinationsDoneWithVaccine: Pick<Vaccination, 'vaccinationDate'>[];
 }
 export interface VaccineOrdersArrivedVars {
