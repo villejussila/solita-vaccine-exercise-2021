@@ -38,6 +38,7 @@ function App() {
           ? convertedDate
           : (convertedDate && removeTimeFromDate(convertedDate)) || null,
       },
+      fetchPolicy: 'cache-and-network',
     }
   );
 

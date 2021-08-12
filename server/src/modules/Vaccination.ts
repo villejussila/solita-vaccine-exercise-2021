@@ -1,4 +1,4 @@
-import { Arg, Int, Query, Resolver } from 'type-graphql';
+import { Int, Query, Resolver } from 'type-graphql';
 import { Vaccination, VaccinationModel } from '../entities/vaccination';
 
 @Resolver(Vaccination)
@@ -9,12 +9,7 @@ export class VaccinationResolver {
   }
 
   @Query((_returns) => [Vaccination])
-  async allVaccinations(
-    @Arg('onDate', { nullable: true }) onDate: string,
-    @Arg('untilDate', { nullable: true }) untilDate: string
-  ): Promise<Vaccination[]> {
-    console.log(onDate);
-    console.log(untilDate);
+  async allVaccinations(): Promise<Vaccination[]> {
     return VaccinationModel.find({});
   }
 }

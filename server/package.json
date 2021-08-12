@@ -5,19 +5,26 @@
   "main": "index.js",
   "scripts": {
     "tsc": "tsc",
-    "dev": "ts-node-dev index.ts",
+    "dev": "cross-env NODE_ENV=development ts-node-dev index.ts",
     "lint": "eslint --ext .ts .",
-    "start": "node ts-build/index.js"
+    "start": "cross-env NODE_ENV=production node ts-build/index.js",
+    "test": "cross-env NODE_ENV=test jest --verbose --runInBand"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@types/dotenv": "^8.2.0",
     "@types/graphql": "^14.5.0",
+    "@types/jest": "^26.0.24",
     "@types/lodash": "^4.14.172",
+    "@types/supertest": "^2.0.11",
     "@typescript-eslint/eslint-plugin": "^4.28.5",
     "@typescript-eslint/parser": "^4.28.5",
+    "cross-env": "^7.0.3",
     "eslint": "^7.32.0",
+    "jest": "^27.0.6",
+    "supertest": "^6.1.5",
+    "ts-jest": "^27.0.4",
     "ts-node-dev": "^1.1.8",
     "typescript": "^4.3.5"
   },

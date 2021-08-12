@@ -4,7 +4,7 @@
 # -----------------------------------------------
 
 type Query {
-  allVaccinations(onDate: String, untilDate: String): [Vaccination!]!
+  allVaccinations: [Vaccination!]!
   allVaccineOrders(vaccine: VaccineInput): [VaccineOrder!]!
   vaccinationCount: Int!
   vaccineOrderCount: Int!

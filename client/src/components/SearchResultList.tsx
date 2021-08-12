@@ -30,7 +30,7 @@ const SearchResultList = ({
   convertedDate,
   loadingOrders,
   initialData,
-  initialLoading,
+  // initialLoading,
 }: Props) => {
   const [interestingData, setInterestingData] = useState<InterestingData>(
     () => {
@@ -110,7 +110,7 @@ const SearchResultList = ({
     });
   };
   useEffect(() => {
-    if (initialData) parseData(initialData);
+    // if (initialData) parseData(initialData);
   }, [initialData]);
 
   useEffect(() => {
@@ -118,7 +118,7 @@ const SearchResultList = ({
     emptyCachedStaleData();
     parseData(dataArrivedByDate);
   }, [dataArrivedByDate]);
-  
+
   const emptyCachedStaleData = () => {
     setInterestingData(() => ({
       ordersArrived: 0,
@@ -159,7 +159,7 @@ const SearchResultList = ({
     }
   };
 
-  if (loadingOrders || initialLoading)
+  if (loadingOrders)
     return (
       <Box display="flex" justifyContent="center" style={{ marginTop: 50 }}>
         <CircularProgress />

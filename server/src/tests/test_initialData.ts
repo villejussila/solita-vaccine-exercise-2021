@@ -1,0 +1,132 @@
+export const initialVaccineOrders = [
+  {
+    id: '6da3a8cf-c923-4c77-8f80-c69c935fe1df',
+    orderNumber: 1,
+    responsiblePerson: 'Joonatan Siloma',
+    healthCareDistrict: 'KYS',
+    vaccine: 'Antiqua',
+    injections: 4,
+    arrived: '2021-01-11T08:59:28.642790Z',
+  },
+  {
+    id: '1251aa6c-ebaf-4e33-89d3-d6f210497b94',
+    orderNumber: 2,
+    responsiblePerson: 'Tarvo Puro',
+    healthCareDistrict: 'TAYS',
+    vaccine: 'Antiqua',
+    injections: 4,
+    arrived: '2021-01-10T01:29:26.642846Z',
+  },
+  {
+    id: '8317f3a9-a0d4-4b7d-b9d3-90d6096b7871',
+    orderNumber: 29,
+    responsiblePerson: 'Valio Karisto',
+    healthCareDistrict: 'HYKS',
+    vaccine: 'Antiqua',
+    injections: 4,
+    arrived: '2021-03-28T02:01:12.643506Z',
+  },
+  {
+    id: '2145116d-7b2d-41b3-b4f6-0026caf5a9b2',
+    orderNumber: 0,
+    responsiblePerson: 'Lyyli Koulumies',
+    healthCareDistrict: 'HYKS',
+    vaccine: 'SolarBuddhica',
+    injections: 6,
+    arrived: '2021-02-24T18:26:23.642310Z',
+  },
+  {
+    id: '2b923c88-a3b7-4b00-a71e-01ddebbc23f5',
+    orderNumber: 20,
+    responsiblePerson: 'Riku Koulumies',
+    healthCareDistrict: 'KYS',
+    vaccine: 'SolarBuddhica',
+    injections: 6,
+    arrived: '2021-03-14T14:25:10.643320Z',
+  },
+  {
+    id: '6aa12a07-1f54-43ce-a2e5-933dd9b84398',
+    orderNumber: 41,
+    responsiblePerson: 'Severi Louhivuori',
+    healthCareDistrict: 'HYKS',
+    vaccine: 'SolarBuddhica',
+    injections: 6,
+    arrived: '2021-04-11T12:21:37.643803Z',
+  },
+  {
+    id: 'b7ac8ca3-1f22-40ed-b77f-64c11ecb122e',
+    orderNumber: 38,
+    responsiblePerson: 'Raimo Heljas',
+    healthCareDistrict: 'OYS',
+    vaccine: 'Zerpfy',
+    injections: 5,
+    arrived: '2021-03-08T14:15:43.643714Z',
+  },
+  {
+    id: '7388a621-6880-4821-ba3a-a1fdd230dad1',
+    orderNumber: 54,
+    responsiblePerson: 'Roosa Nuorpuu',
+    healthCareDistrict: 'TYKS',
+    vaccine: 'Zerpfy',
+    injections: 5,
+    arrived: '2021-04-10T21:52:29.644078Z',
+  },
+  {
+    id: 'ec744f1c-fdd9-4606-913a-beed0254a834',
+    orderNumber: 64,
+    responsiblePerson: 'Kylli Lahdensuo',
+    healthCareDistrict: 'TAYS',
+    vaccine: 'Zerpfy',
+    injections: 5,
+    arrived: '2021-01-18T23:06:52.644401Z',
+  },
+];
+
+export const initialVaccinations = [
+  // Antiqua, orderNumber 1
+  {
+    sourceBottle: '6da3a8cf-c923-4c77-8f80-c69c935fe1df',
+    gender: 'female',
+    vaccinationDate: '2021-02-09T09:38:01.642790Z',
+    vaccinationId: '440ed0d1-5c6b-43f2-8927-fd11662c6407',
+  },
+  // Antiqua, orderNumber 2
+  {
+    sourceBottle: '1251aa6c-ebaf-4e33-89d3-d6f210497b94',
+    gender: 'female',
+    vaccinationDate: '2021-01-12T19:44:32.642846Z',
+    vaccinationId: '303d3a3f-4a04-459c-8696-468f484af909',
+  },
+  {
+    sourceBottle: '1251aa6c-ebaf-4e33-89d3-d6f210497b94',
+    gender: 'male',
+    vaccinationDate: '2021-02-09T00:33:13.642846Z',
+    vaccinationId: 'd1af957e-f9b4-4322-af8f-397bd7b6a405',
+  },
+  {
+    sourceBottle: '1251aa6c-ebaf-4e33-89d3-d6f210497b94',
+    gender: 'female',
+    vaccinationDate: '2021-01-11T21:53:01.642846Z',
+    vaccinationId: 'dd95004a-8de9-4121-9ec9-071beb827ffb',
+  },
+  // SolarBuddhica, orderNumber 41
+  {
+    sourceBottle: '6aa12a07-1f54-43ce-a2e5-933dd9b84398',
+    gender: 'nonbinary',
+    vaccinationDate: '2021-04-12T07:38:00.434465Z',
+    vaccinationId: '549a20cb-1198-4e5a-8d84-e6f7b37c9edc',
+  },
+  // Zerpfy, orderNumber 64
+  {
+    sourceBottle: 'ec744f1c-fdd9-4606-913a-beed0254a834',
+    gender: 'male',
+    vaccinationDate: '2021-02-17T01:23:04.644401Z',
+    vaccinationId: '10f2a45f-fa25-42f5-a3ed-ed46f7c872b6',
+  },
+  {
+    sourceBottle: 'ec744f1c-fdd9-4606-913a-beed0254a834',
+    gender: 'male',
+    vaccinationDate: '2021-02-16T17:09:05.644401Z',
+    vaccinationId: '2cd329d8-6b37-4268-94dc-09f910606ba8',
+  },
+];

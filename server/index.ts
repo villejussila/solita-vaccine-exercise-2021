@@ -1,4 +1,4 @@
-import config from './src/utils/config';
+import config, { NODE_ENV } from './src/utils/config';
 import 'reflect-metadata';
 import express from 'express';
 import mongoose from 'mongoose';
@@ -9,8 +9,9 @@ import { VaccinationResolver } from './src/modules/Vaccination';
 import path from 'path';
 import { TypegooseMiddleware } from './typegoose-middleware';
 import { createVaccinationLoader } from './src/loaders/VaccinationLoader';
+const app = express();
 
-const startServer = async () => {
+export const startServer = async () => {
   try {
     console.log('Connecting to MongoDB');
     await mongoose.connect(config.MONGODB_URI, {
@@ -29,21 +30,24 @@ const startServer = async () => {
     emitSchemaFile: path.resolve(__dirname, 'schema.gql'),
     globalMiddlewares: [TypegooseMiddleware],
   });
-
   const server = new ApolloServer({
     schema,
     context: () => ({ vaccinationLoader: createVaccinationLoader() }),
   });
 
-  const app = express();
-  void (await server.start());
-  server.applyMiddleware({ app });
+  if (NODE_ENV !== 'test') {
+    void (await server.start());
+    server.applyMiddleware({ app });
 
-  app.use(express.static('build'));
-
-  app.listen({ port: config.PORT }, () =>
-    console.log(`Server started at http://localhost:4000${server.graphqlPath}`)
-  );
+    app.use(express.static('build'));
+    app.listen({ port: config.PORT }, () =>
+      console.log(
+        `Server started at http://localhost:4000${server.graphqlPath}`
+      )
+    );
+  }
 };
 
-void startServer();
+if (NODE_ENV !== 'test') {
+  void startServer();
+}

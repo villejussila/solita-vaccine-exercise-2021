@@ -29,7 +29,7 @@ export const getExpirationDate = (arrivalDate: string) => {
   return dateISO;
 };
 
-const isDaylightSavingTime = (date: Date) => {
+export const isDaylightSavingTime = (date: Date) => {
   const stdTimezoneOffset = (date: Date) => {
     const jan = new Date(date.getFullYear(), 0, 1);
     const jul = new Date(date.getFullYear(), 6, 1);

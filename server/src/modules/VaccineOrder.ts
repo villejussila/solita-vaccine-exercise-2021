@@ -130,6 +130,7 @@ const vaccineOrdersArrivedByDate = (date: string) => {
     throw new Error('invalid date format: ' + date);
   }
   const dateISO = new Date(date).toISOString();
+  console.log(JSON.stringify(dateISO));
   return VaccineOrderModel.find({ arrived: { $lte: dateISO } });
 };
 
