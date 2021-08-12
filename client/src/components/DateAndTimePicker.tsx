@@ -38,7 +38,7 @@ export default function MaterialUIPickers({
           format="MM/dd/yyyy"
           margin="normal"
           id="date-picker-inline"
-          label="Date picker inline"
+          label="Date"
           value={selectedDate}
           onChange={handleDateChange}
           KeyboardButtonProps={{
@@ -50,13 +50,14 @@ export default function MaterialUIPickers({
           ampm={false}
           id="time-picker"
           format="HH:mm:ss"
-          label="Time picker"
+          label="Time"
           views={['hours', 'minutes', 'seconds']}
           value={selectedDate}
           onChange={handleDateChange}
           KeyboardButtonProps={{
             'aria-label': 'change time',
           }}
+          disabled={!checked}
         />
         <Button
           color="primary"
@@ -66,10 +67,7 @@ export default function MaterialUIPickers({
         >
           Search
         </Button>
-        <Checkbox
-          checked={checked}
-          onChange={handleCheckedChange}
-        ></Checkbox>
+        <Checkbox checked={checked} onChange={handleCheckedChange}></Checkbox>
         <Typography variant="body2">Include time?</Typography>
       </Grid>
     </MuiPickersUtilsProvider>

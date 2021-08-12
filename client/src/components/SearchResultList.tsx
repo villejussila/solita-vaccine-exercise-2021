@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Table,
   TableBody,
@@ -11,28 +10,29 @@ import {
 } from '@material-ui/core';
 import { startOfDay } from 'date-fns';
 import React from 'react';
+import { useState, useEffect } from 'react';
 
 import { convertLocalTime, isExpiredInTenDays } from '../utils';
-import {
-  Vaccine,
-  VaccineOrdersArrivedByDateData,
-  VaccineOrdersArrivedOnDateData,
-} from '../queries';
+import { Vaccine, VaccineOrdersArrivedByDateData } from '../types';
+
+import { InterestingData } from '../types';
 
 interface Props {
   dataArrivedByDate?: VaccineOrdersArrivedByDateData;
-  dataArrivedOnDate?: VaccineOrdersArrivedOnDateData;
   convertedDate: string | null;
   loadingOrders: boolean;
+  initialLoading: boolean;
+  initialData?: VaccineOrdersArrivedByDateData;
 }
 
 const SearchResultList = ({
   dataArrivedByDate,
-  dataArrivedOnDate,
   convertedDate,
   loadingOrders,
+  initialData,
+  initialLoading,
 }: Props) => {
-  const [interestingData, setInterestingData] = React.useState<InterestingData>(
+  const [interestingData, setInterestingData] = useState<InterestingData>(
     () => {
       return {
         ordersArrived: 0,
@@ -59,25 +59,6 @@ const SearchResultList = ({
       };
     }
   );
-
-  interface Producer {
-    [key: string]: {
-      orders: number;
-      vaccines: number;
-    };
-  }
-
-  interface InterestingData {
-    ordersArrived: number;
-    vaccinesArrived: number;
-    vaccinationsUsed: number;
-    producer: Producer;
-    bottlesExpiredOnDay: number;
-    expiredVaccinesBeforeUsage: number;
-    vaccinesLeftNotExpired: number;
-    vaccinesExpiringNextTenDays: number;
-  }
-
   const parseData = (data: VaccineOrdersArrivedByDateData) => {
     if (!convertedDate) throw new Error('No given day');
     const dayStartMS = Date.parse(
@@ -94,12 +75,7 @@ const SearchResultList = ({
       if (isExpiredInTenDays(givenDayMS, bottleExpiresMS)) {
         isExpiringInTenDays = true;
       }
-      // doesn't work, currentProducer is type SOLAR_BUDDHICA, not SolarBuddhica
-      let currentProducer = order.vaccine.toString();
-      if (currentProducer === 'SOLAR_BUDDHICA')
-        currentProducer = 'SolarBuddhica';
-      if (currentProducer === 'ANTIQUA') currentProducer = 'Antiqua';
-      if (currentProducer === 'ZERPFY') currentProducer = 'Zerpfy';
+      const currentProducer = stringifyCurrentProducerName(order.vaccine);
 
       setInterestingData((prevData) => ({
         ...prevData,
@@ -133,14 +109,17 @@ const SearchResultList = ({
       }));
     });
   };
-  React.useEffect(() => {
+  useEffect(() => {
+    if (initialData) parseData(initialData);
+  }, [initialData]);
+
+  useEffect(() => {
     if (!dataArrivedByDate) return;
-    emptyCachedData();
+    emptyCachedStaleData();
     parseData(dataArrivedByDate);
   }, [dataArrivedByDate]);
-  if (interestingData) console.log(interestingData);
-
-  const emptyCachedData = () => {
+  
+  const emptyCachedStaleData = () => {
     setInterestingData(() => ({
       ordersArrived: 0,
       vaccinesArrived: 0,
@@ -166,13 +145,23 @@ const SearchResultList = ({
     }));
   };
 
-  if (loadingOrders)
+  const stringifyCurrentProducerName = (vaccine: Vaccine): string => {
+    const currentProducer = vaccine.toString();
+    switch (currentProducer) {
+      case 'SOLAR_BUDDHICA':
+        return 'SolarBuddhica';
+      case 'ANTIQUA':
+        return 'Antiqua';
+      case 'ZERPFY':
+        return 'Zerpfy';
+      default:
+        throw new Error('invalid vaccine producer name');
+    }
+  };
+
+  if (loadingOrders || initialLoading)
     return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        style={{ marginTop: 50 }}
-      >
+      <Box display="flex" justifyContent="center" style={{ marginTop: 50 }}>
         <CircularProgress />
       </Box>
     );
@@ -216,24 +205,28 @@ const SearchResultList = ({
           <TableRow>
             <TableCell>Orders / Vaccines per producer: SolarBuddhica</TableCell>
             <TableCell>
+              <strong>Orders</strong>{' '}
               {interestingData.producer.SolarBuddhica.orders}
               {' / '}
+              <strong>Vaccines</strong>{' '}
               {interestingData.producer.SolarBuddhica.vaccines}
             </TableCell>
           </TableRow>
           <TableRow>
             <TableCell>Orders / Vaccines per producer: Antiqua</TableCell>
             <TableCell>
-              {interestingData.producer.Antiqua.orders}
+              <strong>Orders</strong> {interestingData.producer.Antiqua.orders}
               {' / '}
+              <strong>Vaccines</strong>{' '}
               {interestingData.producer.Antiqua.vaccines}
             </TableCell>
           </TableRow>
           <TableRow>
             <TableCell>Orders / Vaccines per producer: Zerpfy</TableCell>
             <TableCell>
-              {interestingData.producer.Zerpfy.orders}
+              <strong>Orders</strong> {interestingData.producer.Zerpfy.orders}
               {' / '}
+              <strong>Vaccines</strong>{' '}
               {interestingData.producer.Zerpfy.vaccines}
             </TableCell>
           </TableRow>

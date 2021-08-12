@@ -1,12 +1,10 @@
 import React from 'react';
-import { useLazyQuery } from '@apollo/client';
+import { useQuery, useLazyQuery } from '@apollo/client';
+import { VACCINE_ORDER_ARRIVED_BY_DATE } from './queries';
 import {
   VaccineOrdersArrivedVars,
   VaccineOrdersArrivedByDateData,
-  VaccineOrdersArrivedOnDateData,
-  VACCINE_ORDER_ARRIVED_BY_DATE,
-  VACCINE_ORDER_ARRIVED_ON_DATE,
-} from './queries';
+} from './types';
 import { AppBar, Container, Toolbar, Typography } from '@material-ui/core';
 import DateAndTimePicker from './components/DateAndTimePicker';
 import { convertLocalTime, removeTimeFromDate } from './utils';
@@ -22,6 +20,13 @@ function App() {
   const [isTimeIncludedChecked, setIsTimeIncludedChecked] =
     React.useState<boolean>(true);
 
+  const { loading: initialLoading, data: initialVaccineOrderData } = useQuery<
+    VaccineOrdersArrivedByDateData,
+    VaccineOrdersArrivedVars
+  >(VACCINE_ORDER_ARRIVED_BY_DATE, {
+    variables: { date: convertedDate },
+  });
+
   const [
     getVaccineOrdersArrivedBy,
     { loading: loadingOrders, data: vaccineOrdersArrivedByDate },
@@ -36,22 +41,10 @@ function App() {
     }
   );
 
-  const [getVaccineOrdersArrivedOn, { data: vaccineOrdersArrivedOnDate }] =
-    useLazyQuery<VaccineOrdersArrivedOnDateData, VaccineOrdersArrivedVars>(
-      VACCINE_ORDER_ARRIVED_ON_DATE,
-      {
-        variables: {
-          date: isTimeIncludedChecked
-            ? convertedDate
-            : (convertedDate && removeTimeFromDate(convertedDate)) || null,
-        },
-      }
-    );
-
   const handleDateChange = (newDate: Date | null) => {
     if (!newDate) return null;
-    const parsedDate = convertLocalTime(newDate.toISOString());
-    setConvertedDate(parsedDate);
+    const dateWithoutTimeZone = convertLocalTime(newDate.toISOString());
+    setConvertedDate(dateWithoutTimeZone);
     setSelectedDate(newDate);
     console.log(convertedDate);
   };
@@ -65,11 +58,6 @@ function App() {
           date: dateWithoutTime || null,
         },
       });
-      getVaccineOrdersArrivedOn({
-        variables: {
-          date: dateWithoutTime || null,
-        },
-      });
       return;
     }
     console.log(JSON.stringify(convertedDate));
@@ -78,17 +66,11 @@ function App() {
         date: convertedDate || null,
       },
     });
-    getVaccineOrdersArrivedOn({
-      variables: {
-        date: convertedDate || null,
-      },
-    });
   };
   const handleCheckedChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setIsTimeIncludedChecked(event.target.checked);
   };
-  if (vaccineOrdersArrivedByDate) console.log(vaccineOrdersArrivedByDate);
-  if (vaccineOrdersArrivedOnDate) console.log(vaccineOrdersArrivedOnDate);
+
   return (
     <Container>
       <AppBar position="fixed">
@@ -97,7 +79,7 @@ function App() {
         </Toolbar>
       </AppBar>
       <Typography variant="h2" style={{ marginTop: '64px' }} align="center">
-        Vaccine data
+        Search vaccine data
       </Typography>
       <DateAndTimePicker
         selectedDate={selectedDate}
@@ -108,9 +90,10 @@ function App() {
       />
       <SearchResultList
         dataArrivedByDate={vaccineOrdersArrivedByDate}
-        dataArrivedOnDate={vaccineOrdersArrivedOnDate}
         convertedDate={convertedDate}
         loadingOrders={loadingOrders}
+        initialLoading={initialLoading}
+        initialData={initialVaccineOrderData}
       />
     </Container>
   );
