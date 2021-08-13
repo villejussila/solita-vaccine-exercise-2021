@@ -11,7 +11,7 @@
     "postinstall": "tsc",
     "test": "cross-env NODE_ENV=test jest --verbose --runInBand",
     "build:ui": "rm -rf build && cd ../client/ && npm run build --prod && cp -r build ../server",
-    "deploy": "git add . && git commit -m Heroku && git subtree push --prefix=server heroku master"
+    "deploy": "cd .. && git add . && git commit -m Heroku && git subtree push --prefix=server heroku master"
   },
   "engines": {
     "node": "14.17.0"
