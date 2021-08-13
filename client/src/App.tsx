@@ -20,6 +20,8 @@ function App() {
   const [isTimeIncludedChecked, setIsTimeIncludedChecked] =
     React.useState<boolean>(true);
 
+  const [hasSearched, setHasSearched] = React.useState(false);
+
   const { loading: initialLoading, data: initialVaccineOrderData } = useQuery<
     VaccineOrdersArrivedByDateData,
     VaccineOrdersArrivedVars
@@ -38,7 +40,6 @@ function App() {
           ? convertedDate
           : (convertedDate && removeTimeFromDate(convertedDate)) || null,
       },
-      fetchPolicy: 'cache-and-network',
     }
   );
 
@@ -47,10 +48,10 @@ function App() {
     const dateWithoutTimeZone = convertLocalTime(newDate.toISOString());
     setConvertedDate(dateWithoutTimeZone);
     setSelectedDate(newDate);
-    console.log(convertedDate);
   };
 
   const handleClickSearch = () => {
+    setHasSearched(true);
     if (isTimeIncludedChecked === false) {
       const dateWithoutTime =
         convertedDate && removeTimeFromDate(convertedDate);
@@ -61,7 +62,6 @@ function App() {
       });
       return;
     }
-    console.log(JSON.stringify(convertedDate));
     getVaccineOrdersArrivedBy({
       variables: {
         date: convertedDate || null,
@@ -89,13 +89,15 @@ function App() {
         handleCheckedChange={handleCheckedChange}
         checked={isTimeIncludedChecked}
       />
-      <SearchResultList
-        dataArrivedByDate={vaccineOrdersArrivedByDate}
-        convertedDate={convertedDate}
-        loadingOrders={loadingOrders}
-        initialLoading={initialLoading}
-        initialData={initialVaccineOrderData}
-      />
+      {hasSearched && (
+        <SearchResultList
+          dataArrivedByDate={vaccineOrdersArrivedByDate}
+          convertedDate={convertedDate}
+          loadingOrders={loadingOrders}
+          initialLoading={initialLoading}
+          initialData={initialVaccineOrderData}
+        />
+      )}
     </Container>
   );
 }

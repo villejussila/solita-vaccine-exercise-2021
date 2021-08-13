@@ -10,12 +10,12 @@ import {
 } from '@material-ui/core';
 import { startOfDay } from 'date-fns';
 import React from 'react';
-import { useState, useEffect } from 'react';
+import { useEffect, useReducer } from 'react';
 
 import { convertLocalTime, isExpiredInTenDays } from '../utils';
 import { Vaccine, VaccineOrdersArrivedByDateData } from '../types';
 
-import { InterestingData } from '../types';
+import { ActionType, initialState, interestingDataReducer } from '../reducer';
 
 interface Props {
   dataArrivedByDate?: VaccineOrdersArrivedByDateData;
@@ -29,36 +29,10 @@ const SearchResultList = ({
   dataArrivedByDate,
   convertedDate,
   loadingOrders,
-  initialData,
-  // initialLoading,
+  initialLoading,
 }: Props) => {
-  const [interestingData, setInterestingData] = useState<InterestingData>(
-    () => {
-      return {
-        ordersArrived: 0,
-        vaccinesArrived: 0,
-        vaccinationsUsed: 0,
-        producer: {
-          SolarBuddhica: {
-            orders: 0,
-            vaccines: 0,
-          },
-          Antiqua: {
-            orders: 0,
-            vaccines: 0,
-          },
-          Zerpfy: {
-            orders: 0,
-            vaccines: 0,
-          },
-        },
-        bottlesExpiredOnDay: 0,
-        expiredVaccinesBeforeUsage: 0,
-        vaccinesLeftNotExpired: 0,
-        vaccinesExpiringNextTenDays: 0,
-      };
-    }
-  );
+  const [state, dispatch] = useReducer(interestingDataReducer, initialState);
+
   const parseData = (data: VaccineOrdersArrivedByDateData) => {
     if (!convertedDate) throw new Error('No given day');
     const dayStartMS = Date.parse(
@@ -76,73 +50,26 @@ const SearchResultList = ({
         isExpiringInTenDays = true;
       }
       const currentProducer = stringifyCurrentProducerName(order.vaccine);
-
-      setInterestingData((prevData) => ({
-        ...prevData,
-        ordersArrived: prevData.ordersArrived + 1,
-        vaccinesArrived: prevData.vaccinesArrived + order.injections,
-        vaccinationsUsed:
-          prevData.vaccinationsUsed + order.vaccinationsDoneWithVaccine.length,
-        expiredVaccinesBeforeUsage: order.isBottleExpiredOnDate
-          ? prevData.expiredVaccinesBeforeUsage +
-            (order.injections - order.vaccinationsDoneWithVaccine.length)
-          : prevData.expiredVaccinesBeforeUsage + 0,
-        vaccinesLeftNotExpired: order.isBottleExpiredOnDate
-          ? prevData.vaccinesLeftNotExpired
-          : prevData.vaccinesLeftNotExpired +
-            (order.injections - order.vaccinationsDoneWithVaccine.length),
-        bottlesExpiredOnDay: isBottleExpiredOnGivenDate
-          ? prevData.bottlesExpiredOnDay + 1
-          : prevData.bottlesExpiredOnDay,
-        vaccinesExpiringNextTenDays: isExpiringInTenDays
-          ? prevData.vaccinesExpiringNextTenDays + order.injections
-          : prevData.vaccinesExpiringNextTenDays,
-        producer: {
-          ...prevData.producer,
-          [currentProducer]: {
-            ...prevData.producer[currentProducer],
-            orders: prevData.producer[currentProducer]?.orders + 1,
-            vaccines:
-              prevData.producer[currentProducer]?.vaccines + order.injections,
-          },
+      dispatch({
+        type: ActionType.INCREMENT,
+        payload: {
+          order,
+          currentProducer,
+          isBottleExpiredOnGivenDate,
+          isExpiringInTenDays,
         },
-      }));
+      });
     });
   };
-  useEffect(() => {
-    // if (initialData) parseData(initialData);
-  }, [initialData]);
 
   useEffect(() => {
     if (!dataArrivedByDate) return;
-    emptyCachedStaleData();
+    emptyCachedData();
     parseData(dataArrivedByDate);
   }, [dataArrivedByDate]);
 
-  const emptyCachedStaleData = () => {
-    setInterestingData(() => ({
-      ordersArrived: 0,
-      vaccinesArrived: 0,
-      vaccinationsUsed: 0,
-      producer: {
-        SolarBuddhica: {
-          orders: 0,
-          vaccines: 0,
-        },
-        Antiqua: {
-          orders: 0,
-          vaccines: 0,
-        },
-        Zerpfy: {
-          orders: 0,
-          vaccines: 0,
-        },
-      },
-      bottlesExpiredOnDay: 0,
-      expiredVaccinesBeforeUsage: 0,
-      vaccinesLeftNotExpired: 0,
-      vaccinesExpiringNextTenDays: 0,
-    }));
+  const emptyCachedData = () => {
+    dispatch({ type: ActionType.INIT });
   };
 
   const stringifyCurrentProducerName = (vaccine: Vaccine): string => {
@@ -158,6 +85,13 @@ const SearchResultList = ({
         throw new Error('invalid vaccine producer name');
     }
   };
+
+  if (initialLoading && !dataArrivedByDate)
+    return (
+      <Box display="flex" justifyContent="center" style={{ marginTop: 50 }}>
+        <CircularProgress />
+      </Box>
+    );
 
   if (loadingOrders)
     return (
@@ -175,59 +109,55 @@ const SearchResultList = ({
         </TableHead>
         <TableBody>
           <TableRow>
-            <TableCell>Orders Arrived</TableCell>
-            <TableCell>{interestingData.ordersArrived}</TableCell>
+            <TableCell>Orders Arrived Total</TableCell>
+            <TableCell>{state.ordersArrived}</TableCell>
           </TableRow>
           <TableRow>
-            <TableCell>Vaccines Arrived</TableCell>
-            <TableCell>{interestingData.vaccinesArrived}</TableCell>
+            <TableCell>Vaccines Arrived Total</TableCell>
+            <TableCell>{state.vaccinesArrived}</TableCell>
           </TableRow>
           <TableRow>
             <TableCell>Vaccines used</TableCell>
-            <TableCell>{interestingData.vaccinationsUsed}</TableCell>
+            <TableCell>{state.vaccinationsUsed}</TableCell>
           </TableRow>
           <TableRow>
             <TableCell>Bottles expired on given day</TableCell>
-            <TableCell>{interestingData.bottlesExpiredOnDay}</TableCell>
+            <TableCell>{state.bottlesExpiredOnDay}</TableCell>
           </TableRow>
           <TableRow>
             <TableCell>Vaccines expired before usage</TableCell>
-            <TableCell>{interestingData.expiredVaccinesBeforeUsage}</TableCell>
+            <TableCell>{state.expiredVaccinesBeforeUsage}</TableCell>
           </TableRow>
           <TableRow>
             <TableCell>Vaccines left to use</TableCell>
-            <TableCell>{interestingData.vaccinesLeftNotExpired}</TableCell>
+            <TableCell>{state.vaccinesLeftNotExpired}</TableCell>
           </TableRow>
           <TableRow>
             <TableCell>Vaccines expiring in the next 10 days</TableCell>
-            <TableCell>{interestingData.vaccinesExpiringNextTenDays}</TableCell>
+            <TableCell>{state.vaccinesExpiringNextTenDays}</TableCell>
           </TableRow>
           <TableRow>
             <TableCell>Orders / Vaccines per producer: SolarBuddhica</TableCell>
             <TableCell>
-              <strong>Orders</strong>{' '}
-              {interestingData.producer.SolarBuddhica.orders}
+              <strong>Orders</strong> {state.producer.SolarBuddhica.orders}
               {' / '}
-              <strong>Vaccines</strong>{' '}
-              {interestingData.producer.SolarBuddhica.vaccines}
+              <strong>Vaccines</strong> {state.producer.SolarBuddhica.vaccines}
             </TableCell>
           </TableRow>
           <TableRow>
             <TableCell>Orders / Vaccines per producer: Antiqua</TableCell>
             <TableCell>
-              <strong>Orders</strong> {interestingData.producer.Antiqua.orders}
+              <strong>Orders</strong> {state.producer.Antiqua.orders}
               {' / '}
-              <strong>Vaccines</strong>{' '}
-              {interestingData.producer.Antiqua.vaccines}
+              <strong>Vaccines</strong> {state.producer.Antiqua.vaccines}
             </TableCell>
           </TableRow>
           <TableRow>
             <TableCell>Orders / Vaccines per producer: Zerpfy</TableCell>
             <TableCell>
-              <strong>Orders</strong> {interestingData.producer.Zerpfy.orders}
+              <strong>Orders</strong> {state.producer.Zerpfy.orders}
               {' / '}
-              <strong>Vaccines</strong>{' '}
-              {interestingData.producer.Zerpfy.vaccines}
+              <strong>Vaccines</strong> {state.producer.Zerpfy.vaccines}
             </TableCell>
           </TableRow>
         </TableBody>
