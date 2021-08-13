@@ -7,8 +7,14 @@
     "tsc": "tsc",
     "dev": "cross-env NODE_ENV=development ts-node-dev index.ts",
     "lint": "eslint --ext .ts .",
-    "start": "cross-env NODE_ENV=production node ts-build/index.js",
-    "test": "cross-env NODE_ENV=test jest --verbose --runInBand"
+    "start": "cross-env NODE_ENV=production node dist/index.js",
+    "postinstall": "tsc",
+    "test": "cross-env NODE_ENV=test jest --verbose --runInBand",
+    "build:ui": "rm -rf build && cd ../client/ && npm run build --prod && cp -r build ../server",
+    "deploy": "git add . && git commit -m Heroku && git subtree push --prefix=server heroku master"
+  },
+  "engines": {
+    "node": "14.17.0"
   },
   "author": "",
   "license": "ISC",
