@@ -41,3 +41,17 @@ To use the client in development go to client directory and then run:
 ### `npm start`
 
 You can now open http://localhost:3000 to view it in the browser. If you set the PORT in .env file in the server directory, client should be able to send requests to the server.
+
+## Running End to End tests
+
+First in **server** directory, compile latest ts build by running:
+
+### `npm run tsc`
+
+Then to start server on test e2e mode run:
+
+### `npm run start:teste2e`
+
+Then go to **client** directory, and run:
+
+### `npm run test:e2e`
