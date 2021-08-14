@@ -24,3 +24,5 @@ yarn-error.log*
 
 .prettierrc
 .env
+
+cypress/videos

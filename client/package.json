@@ -26,9 +26,11 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test:e2e": "cypress run",
     "eject": "react-scripts eject",
     "lint": "eslint \"./src/**/*.{ts,tsx}\"",
-    "lint:fix": "eslint \"./src/**/*.{ts,tsx}\" --fix"
+    "lint:fix": "eslint \"./src/**/*.{ts,tsx}\" --fix",
+    "cypress:open": "cypress open"
   },
   "proxy": "http://localhost:4000",
   "eslintConfig": {
@@ -48,5 +50,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "cypress": "^8.2.0",
+    "local-cypress": "^1.2.2"
   }
 }

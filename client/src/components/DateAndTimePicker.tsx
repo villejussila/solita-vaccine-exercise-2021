@@ -62,6 +62,7 @@ export default function MaterialUIPickers({
         <Button
           color="primary"
           variant="contained"
+          id="search-button"
           style={{ height: 48, marginLeft: 12 }}
           onClick={handleClick}
         >

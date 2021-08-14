@@ -38,8 +38,9 @@ const SearchResultList = ({
     const dayStartMS = Date.parse(
       convertLocalTime(startOfDay(Date.parse(convertedDate)).toISOString())
     );
+    const givenDayMS = Date.parse(convertedDate);
+
     data.vaccineOrdersArrivedByDate.forEach((order) => {
-      const givenDayMS = Date.parse(convertedDate);
       const bottleExpiresMS = Date.parse(order.bottleExpires);
       let isBottleExpiredOnGivenDate = false;
       if (bottleExpiresMS > dayStartMS && bottleExpiresMS < givenDayMS) {
@@ -110,7 +111,9 @@ const SearchResultList = ({
         <TableBody>
           <TableRow>
             <TableCell>Orders Arrived Total</TableCell>
-            <TableCell>{state.ordersArrived}</TableCell>
+            <TableCell id="orders-arrived-total">
+              {state.ordersArrived}
+            </TableCell>
           </TableRow>
           <TableRow>
             <TableCell>Vaccines Arrived Total</TableCell>
@@ -126,7 +129,9 @@ const SearchResultList = ({
           </TableRow>
           <TableRow>
             <TableCell>Vaccines expired before usage</TableCell>
-            <TableCell>{state.expiredVaccinesBeforeUsage}</TableCell>
+            <TableCell id="expired-before-usage">
+              {state.expiredVaccinesBeforeUsage}
+            </TableCell>
           </TableRow>
           <TableRow>
             <TableCell>Vaccines left to use</TableCell>

@@ -45,6 +45,7 @@ function App() {
 
   const handleDateChange = (newDate: Date | null) => {
     if (!newDate) return null;
+    if (!Date.parse(newDate.toString())) return;
     const dateWithoutTimeZone = convertLocalTime(newDate.toISOString());
     setConvertedDate(dateWithoutTimeZone);
     setSelectedDate(newDate);

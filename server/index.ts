@@ -20,7 +20,7 @@ export const startServer = async () => {
       useFindAndModify: false,
       useCreateIndex: true,
     });
-    console.log('Connected to MongoDB');
+    console.log('Connected to MongoDB: ', config.MONGODB_URI);
   } catch (error) {
     console.log('Error connecting to MongoDB: ', error.message);
   }

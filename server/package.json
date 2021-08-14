@@ -10,6 +10,7 @@
     "start": "cross-env NODE_ENV=production node dist/index.js",
     "postinstall": "tsc",
     "test": "cross-env NODE_ENV=test jest --verbose --runInBand",
+    "start:teste2e": "cross-env NODE_ENV=teste2e node dist/index.js",
     "build:ui": "rm -rf build && cd ../client/ && npm run build --prod && cp -r build ../server",
     "deploy": "cd .. && git add . && git commit -m Heroku && git subtree push --prefix=server heroku master"
   },
